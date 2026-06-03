@@ -47,6 +47,12 @@ services:
     #      - ${PWD}/tws_settings/:${TWS_SETTINGS_PATH:-/home/ibgateway/Jts}
     #      - ${PWD}/ssh/:/home/ibgateway/.ssh
     ports:
-      - "127.0.0.1:4001:4003"
-      - "127.0.0.1:4002:4004"
+      # 4001/4002 bind ONLY to the docker0 bridge IP (172.17.0.1). Sibling
+      # containers reach the gateway via host.docker.internal (= 172.17.0.1)
+      # but the port is NOT exposed on eth0/lo/IAP -- only containers on the
+      # same host can connect. Defense-in-depth in case the GCP firewall is
+      # ever relaxed.
+      - "172.17.0.1:4001:4003"
+      - "172.17.0.1:4002:4004"
+      # VNC stays loopback-only (no need to reach it from other containers).
       - "127.0.0.1:5900:5900"
